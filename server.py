@@ -10,9 +10,9 @@ from telethon.sync import TelegramClient
 from datetime import datetime
 
 # ===== ваши данные =====
-API_ID       = int(os.getenv('API_ID', '20517386'))
-API_HASH     = os.getenv('API_HASH', '73457be44439ae991e7ba2bf97820a31')
-PHONE        = os.getenv('PHONE', '+79281307511')
+API_ID       = int(os.getenv('API_ID', 'Ваш API_ID'))
+API_HASH     = os.getenv('API_HASH', 'Ваш API_HASH')
+PHONE        = os.getenv('PHONE', '+71234567890')
 GROUP_EXP    = int(os.getenv('GROUP_EXP', '-4731002756'))   # расход
 GROUP_INC    = int(os.getenv('GROUP_INC', '-4829787389'))   # приход
 SESSION_FILE = 'parser.session'
@@ -76,4 +76,5 @@ def index():
     return send_from_directory('.', 'index.html')
 
 if __name__ == '__main__':
+
     app.run(host='0.0.0.0', port=8080, debug=False, threaded=False)
