@@ -1,57 +1,195 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Касса</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Telegram Финансовый Агент</title>
   <style>
-    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial;margin:0;padding:12px;background:#f5f5f5}
-    h3{margin:12px 0 6px;font-size:18px}
-    table{width:100%;border-collapse:collapse;font-size:14px;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.1)}
-    th,td{padding:8px 10px;text-align:left}
-    th{background:#fafafa;color:#555}
-    tr+tr{border-top:1px solid #eaeaea}
-    .expense{color:#e53935}
-    .income{color:#43a047}
+    /* Общие стили для адаптивного и читаемого интерфейса */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    body {
+      background-color: #f5f5f5;
+      padding: 16px;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 20px;
+    }
+    .section {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .section h2 {
+      margin-bottom: 12px;
+      font-size: 16px;
+      color: #1a73e8;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 10px 8px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+      font-size: 14px;
+    }
+    th {
+      color: #5f6368;
+      font-weight: 600;
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+    .empty, .loading, .error {
+      text-align: center;
+      padding: 16px;
+    }
+    .loading {
+      color: #1a73e8;
+    }
+    .error {
+      color: #d93025;
+    }
   </style>
 </head>
 <body>
+  <h1>Финансовые операции из Telegram</h1>
 
-<h3>Расход</h3>
-<table id="expense"><thead><tr><th>Дата</th><th>Сумма</th><th>Описание</th></tr></thead><tbody></tbody></table>
+  <!-- Блок для отображения расходов -->
+  <div class="section">
+    <h2>Расходы</h2>
+    <div id="expense-container">
+      <div class="loading">Загрузка расходов...</div>
+    </div>
+  </div>
 
-<h3>Приход</h3>
-<table id="income"><thead><tr><th>Дата</th><th>Сумма</th><th>Описание</th></tr></thead><tbody></tbody></table>
+  <!-- Блок для отображения доходов -->
+  <div class="section">
+    <h2>Доходы</h2>
+    <div id="income-container">
+      <div class="loading">Загрузка доходов...</div>
+    </div>
+  </div>
 
-<script>
-  // 1. Поддержка Telegram WebApp (раскрываем на весь экран)
-  const tg = window.Telegram.WebApp;
-  tg.expand();
+  <script>
+    /*
+      🔧 КОНФИГУРАЦИЯ БЭКЕНДА
+      Этот URL указывает, откуда брать данные.
+      При локальном запуске (на вашем компьютере) бэкенд работает на http://localhost:8080
+      и предоставляет API по пути /api.
 
-  // 2. Загружаем данные
-  fetch('data.json')
-    .then(r => r.json())
-    .then(drawTables)
-    .catch(err => alert('Ошибка загрузки: ' + err));
+      ВАЖНО:
+      - Если вы запускаете Mini App в Telegram, localhost НЕ БУДЕТ РАБОТАТЬ!
+      - После развёртывания бэкенда (например, на Railway, Heroku и т.д.)
+        замените 'http://localhost:8080' на ваш публичный HTTPS-адрес.
+      - Например: 'https://my-finance-agent.up.railway.app'
+    */
+    const API_BASE = 'http://localhost:8080/api';
 
-  // 3. Рисуем таблицы
-  function drawTables(list) {
-    const expBody = document.querySelector('#expense tbody');
-    const incBody = document.querySelector('#income tbody');
+    /*
+      📊 Функция отрисовки таблицы
+      Принимает:
+        - containerId: ID HTML-элемента, куда вставить таблицу (например, 'income-container')
+        - data: массив транзакций, полученный от бэкенда
+    */
+    function renderTable(containerId, data) {
+      const container = document.getElementById(containerId);
 
-    list.sort((a, b) => new Date(b.date) - new Date(a.date));
+      // Если данных нет — показываем "Нет операций"
+      if (!data || data.length === 0) {
+        container.innerHTML = '<div class="empty">Нет операций</div>';
+        return;
+      }
 
-    list.forEach(item => {
-      const row = `<tr>
-        <td>${new Date(item.date).toLocaleDateString('ru-RU')}</td>
-        <td class="${item.type}">${item.amount.toLocaleString('ru')} ₽</td>
-        <td>${item.desc}</td>
-      </tr>`;
-      item.type === 'expense'
-        ? expBody.insertAdjacentHTML('beforeend', row)
-        : incBody.insertAdjacentHTML('beforeend', row);
+      // Начинаем строить HTML-таблицу
+      let html = `
+        <table>
+          <thead>
+            <tr>
+              <th>Дата</th>
+              <th>Сумма</th>
+              <th>Описание</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      // Проходим по каждой транзакции
+      data.forEach(item => {
+        // Преобразуем timestamp (в секундах) в дату в формате ГГГГ-ММ-ДД
+        const date = new Date(item.timestamp * 1000).toISOString().split('T')[0];
+        
+        // Определяем знак: доход — "+", расход — "-"
+        const sign = item.type === 'income' ? '+' : '-';
+        const amount = `${sign}${item.amount} ₽`;
+
+        // Добавляем строку в таблицу
+        html += `
+          <tr>
+            <td>${date}</td>
+            <td>${amount}</td>
+            <td>${item.description || '—'}</td>
+          </tr>
+        `;
+      });
+
+      html += `</tbody></table>`;
+      container.innerHTML = html;
+    }
+
+    /*
+      🌐 Функция загрузки данных с бэкенда
+      Принимает тип: 'income' или 'expense'
+      Делает GET-запрос к /api/transactions/{type}
+    */
+    async function fetchData(type) {
+      try {
+        // Формируем полный URL, например: http://localhost:8080/api/transactions/income
+        const url = `${API_BASE}/transactions/${type}`;
+        const response = await fetch(url);
+
+        // Если сервер вернул ошибку (404, 500 и т.д.)
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        // Парсим JSON-ответ
+        const data = await response.json();
+
+        // Отображаем данные в нужном контейнере
+        renderTable(`${type}-container`, data);
+      } catch (error) {
+        // В случае ошибки (нет интернета, сервер не отвечает и т.д.)
+        // показываем сообщение об ошибке
+        const container = document.getElementById(`${type}-container`);
+        container.innerHTML = `
+          <div class="error">
+            Не удалось загрузить ${type === 'income' ? 'доходы' : 'расходы'}:<br>
+            ${error.message}
+          </div>
+        `;
+      }
+    }
+
+    /*
+      ▶️ ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ
+      Как только страница загружена — запускаем загрузку данных
+    */
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchData('expense'); // Загружаем расходы
+      fetchData('income');  // Загружаем доходы
     });
-  }
-</script>
+  </script>
 </body>
 </html>
