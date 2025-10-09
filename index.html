@@ -1,196 +1,210 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Telegram Финансовый Агент</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Касса</title>
   <style>
-    /* Общие стили для адаптивного и читаемого интерфейса */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    :root {
+      --primary: #007bff;
+      --success: #28a745;
+      --danger: #dc3545;
+      --light: #f8f9fa;
+      --dark: #343a40;
+      --shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
     body {
-      background-color: #f5f5f5;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      margin: 0;
       padding: 16px;
-      color: #333;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: var(--dark);
     }
-    h1 {
-      text-align: center;
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
       margin-bottom: 20px;
-      font-size: 20px;
     }
-    .section {
+    button:hover {
+      background: #0056b3;
+    }
+    .tables-container {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .table-card {
       background: white;
       border-radius: 12px;
       padding: 16px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      box-shadow: var(--shadow);
+      flex: 1;
+      min-width: 300px;
+      max-width: 500px;
     }
-    .section h2 {
-      margin-bottom: 12px;
-      font-size: 16px;
-      color: #1a73e8;
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
     }
+    input {
+      width: 50%;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+    h3 {
+      margin: 0 0 8px 0;
+      color: var(--dark);
+      font-size: 20px;
+    }
+    h4 {
+      margin: 0 0 16px 0;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    h4.expense-total { color: var(--danger); }
+    h4.income-total { color: var(--success); }
     table {
       width: 100%;
       border-collapse: collapse;
+      font-size: 14px;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
     }
     th, td {
-      padding: 10px 8px;
+      padding: 12px;
       text-align: left;
-      border-bottom: 1px solid #eee;
-      font-size: 14px;
     }
     th {
-      color: #5f6368;
+      background: #f8f9fa;
+      color: var(--dark);
       font-weight: 600;
     }
-    tr:last-child td {
-      border-bottom: none;
+    tr:nth-child(even) {
+      background: #f8f9fa;
     }
-    .empty, .loading, .error {
+    tr:hover {
+      background: #e9ecef;
+    }
+    .expense { color: var(--danger); font-weight: 500; }
+    .income { color: var(--success); font-weight: 500; }
+    .balance-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: var(--shadow);
       text-align: center;
-      padding: 16px;
+      margin: 20px 0;
     }
-    .loading {
-      color: #1a73e8;
+    #balance-text {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0;
     }
-    .error {
-      color: #d93025;
+    @media (max-width: 768px) {
+      body { padding: 8px; }
+      .tables-container { flex-direction: column; gap: 16px; }
+      .table-card { min-width: unset; }
+      h3 { font-size: 18px; }
+      h4 { font-size: 16px; }
+      table { font-size: 12px; }
+      th, td { padding: 8px; }
+      button { width: 100%; }
     }
   </style>
 </head>
 <body>
-  <h1>Финансовые операции из Telegram</h1>
+<div class="container">
+<button onclick="updateGroups()">Обновить группы</button>
+<div class="balance-card">
+<h2 id="balance-text">Остаток: 0 ₽</h2>
+</div>
+<div class="tables-container">
+<div class="table-card">
+<label>ID группы расходов: <input id="expense-group" value="-4731002756"></label>
+<h3>Расход</h3>
+<h4 id="expense-total" class="expense-total">Сумма: 0 ₽</h4>
+<table id="expense"><thead><tr><th>Дата</th><th>Сумма</th><th>Описание</th></tr></thead><tbody></tbody></table>
+</div>
+<div class="table-card">
+<label>ID группы приходов: <input id="income-group" value="-4829787389"></label>
+<h3>Приход</h3>
+<h4 id="income-total" class="income-total">Сумма: 0 ₽</h4>
+<table id="income"><thead><tr><th>Дата</th><th>Сумма</th><th>Описание</th></tr></thead><tbody></tbody></table>
+</div>
+</div>
+</div>
+<script>
+  // раскрываем Mini App
+  if(window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.expand();
 
-  <!-- Блок для отображения расходов -->
-  <div class="section">
-    <h2>Расходы</h2>
-    <div id="expense-container">
-      <div class="loading">Загрузка расходов...</div>
-    </div>
-  </div>
+  fetch('/api/transactions')
+    .then(r=>r.json())
+    .then(drawTables)
+    .catch(err=>alert('Ошибка загрузки: '+err));
 
-  <!-- Блок для отображения доходов -->
-  <div class="section">
-    <h2>Доходы</h2>
-    <div id="income-container">
-      <div class="loading">Загрузка доходов...</div>
-    </div>
-  </div>
-
-  <script>
-    /*
-      🔧 КОНФИГУРАЦИЯ БЭКЕНДА
-      Этот URL указывает, откуда брать данные.
-      При локальном запуске (на вашем компьютере) бэкенд работает на http://localhost:8080
-      и предоставляет API по пути /api.
-
-      ВАЖНО:
-      - Если вы запускаете Mini App в Telegram, localhost НЕ БУДЕТ РАБОТАТЬ!
-      - После развёртывания бэкенда (например, на Railway, Heroku и т.д.)
-        замените 'http://localhost:8080' на ваш публичный HTTPS-адрес.
-      - Например: 'https://my-finance-agent.up.railway.app'
-    */
-    const API_BASE = 'https://narekman21.github.io/mini-expense/';
-
-    /*
-      📊 Функция отрисовки таблицы
-      Принимает:
-        - containerId: ID HTML-элемента, куда вставить таблицу (например, 'income-container')
-        - data: массив транзакций, полученный от бэкенда
-    */
-    function renderTable(containerId, data) {
-      const container = document.getElementById(containerId);
-
-      // Если данных нет — показываем "Нет операций"
-      if (!data || data.length === 0) {
-        container.innerHTML = '<div class="empty">Нет операций</div>';
-        return;
+  function drawTables(list){
+    const expBody=document.querySelector('#expense tbody');
+    const incBody=document.querySelector('#income tbody');
+    expBody.innerHTML = '';
+    incBody.innerHTML = '';
+    let totalExp = 0;
+    let totalInc = 0;
+    list.forEach(item=>{
+      const row=`<tr>
+        <td>${new Date(item.date).toLocaleDateString('ru-RU')}</td>
+        <td class="${item.type}">${item.amount.toLocaleString('ru')} ₽</td>
+        <td>${item.desc}</td>
+      </tr>`;
+      if (item.type==='expense') {
+        expBody.insertAdjacentHTML('beforeend',row);
+        totalExp += item.amount;
+      } else {
+        incBody.insertAdjacentHTML('beforeend',row);
+        totalInc += item.amount;
       }
-
-      // Начинаем строить HTML-таблицу
-      let html = `
-        <table>
-          <thead>
-            <tr>
-              <th>Дата</th>
-              <th>Сумма</th>
-              <th>Описание</th>
-            </tr>
-          </thead>
-          <tbody>
-      `;
-
-      // Проходим по каждой транзакции
-      data.forEach(item => {
-        // Преобразуем timestamp (в секундах) в дату в формате ГГГГ-ММ-ДД
-        const date = new Date(item.timestamp * 1000).toISOString().split('T')[0];
-        
-        // Определяем знак: доход — "+", расход — "-"
-        const sign = item.type === 'income' ? '+' : '-';
-        const amount = `${sign}${item.amount} ₽`;
-
-        // Добавляем строку в таблицу
-        html += `
-          <tr>
-            <td>${date}</td>
-            <td>${amount}</td>
-            <td>${item.description || '—'}</td>
-          </tr>
-        `;
-      });
-
-      html += `</tbody></table>`;
-      container.innerHTML = html;
-    }
-
-    /*
-      🌐 Функция загрузки данных с бэкенда
-      Принимает тип: 'income' или 'expense'
-      Делает GET-запрос к /api/transactions/{type}
-    */
-    async function fetchData(type) {
-      try {
-        // Формируем полный URL, например: http://localhost:8080/api/transactions/income
-        const url = `${API_BASE}/transactions/${type}`;
-        const response = await fetch(url);
-
-        // Если сервер вернул ошибку (404, 500 и т.д.)
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-
-        // Парсим JSON-ответ
-        const data = await response.json();
-
-        // Отображаем данные в нужном контейнере
-        renderTable(`${type}-container`, data);
-      } catch (error) {
-        // В случае ошибки (нет интернета, сервер не отвечает и т.д.)
-        // показываем сообщение об ошибке
-        const container = document.getElementById(`${type}-container`);
-        container.innerHTML = `
-          <div class="error">
-            Не удалось загрузить ${type === 'income' ? 'доходы' : 'расходы'}:<br>
-            ${error.message}
-          </div>
-        `;
-      }
-    }
-
-    /*
-      ▶️ ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ
-      Как только страница загружена — запускаем загрузку данных
-    */
-    document.addEventListener('DOMContentLoaded', () => {
-      fetchData('expense'); // Загружаем расходы
-      fetchData('income');  // Загружаем доходы
     });
-  </script>
+    document.getElementById('expense-total').textContent = `Сумма: ${totalExp.toLocaleString('ru')} ₽`;
+    document.getElementById('income-total').textContent = `Сумма: ${totalInc.toLocaleString('ru')} ₽`;
+    const balance = totalInc - totalExp;
+    const balanceEl = document.getElementById('balance-text');
+    balanceEl.textContent = `Остаток: ${balance.toLocaleString('ru')} ₽`;
+    balanceEl.style.color = balance >= 0 ? 'var(--success)' : 'var(--danger)';
+  }
+
+  function updateGroups() {
+    const exp = document.getElementById('expense-group').value;
+    const inc = document.getElementById('income-group').value;
+    fetch('/api/update_groups', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({expense: parseInt(exp), income: parseInt(inc)})
+    })
+    .then(r => r.json())
+    .then(() => {
+      fetch('/api/transactions')
+      .then(r=>r.json())
+      .then(drawTables)
+      .catch(err=>alert('Ошибка загрузки: '+err));
+    })
+    .catch(err=>alert('Ошибка обновления: '+err));
+  }
+</script>
 </body>
 </html>
-
