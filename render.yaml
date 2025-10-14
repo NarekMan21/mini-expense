@@ -6,15 +6,15 @@ services:
     startCommand: python server.py
     envVars:
       - key: API_ID
-        value: "20517386"
+        value: "${API_ID}"
       - key: API_HASH
-        value: "73457be44439ae991e7ba2bf97820a31"
+        value: "${API_HASH}"
       - key: PHONE
-        value: "+79281307511"
+        value: "${PHONE}"
       - key: GROUP_EXP
-        value: "-4731002756"
+        value: "${GROUP_EXP}"
       - key: GROUP_INC
-        value: "-4829787389"
+        value: "${GROUP_INC}"
       - key: SESSION_FILE
         value: "render.session"  # отдельная сессия для Render
       - key: SKIP_AUTH
