@@ -40,8 +40,13 @@ client = TelegramClient(SESSION_FILE, API_ID, API_HASH)
 
 def fetch_messages():
     """Возвращает список транзакций из двух групп."""
-    if not client.is_connected():
-        client.start(phone=PHONE)   # первый раз запросит код
+    try:
+        if not client.is_connected():
+            client.start(phone=PHONE)   # первый раз запросит код
+    except Exception as e:
+        print(f"Auth error: {e}")
+        return []  # return empty list on auth failure
+
     rows = []
     try:
         # 1) расходная группа
