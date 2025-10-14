@@ -14,9 +14,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
-# Create non-root user
-RUN useradd --create-home --shell /bin/bash app \
+# Create non-root user and fix permissions
+RUN useradd --create-home --shell /bin/bash --uid 1000 --gid 1000 app \
+    && mkdir -p /app \
     && chown -R app:app /app
+
+# Switch to non-root user
 USER app
 
 EXPOSE 8080

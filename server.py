@@ -33,6 +33,11 @@ except ValueError as e:
 
 SESSION_FILE = os.getenv('SESSION_FILE', 'parser.session')
 SKIP_AUTH = os.getenv('SKIP_AUTH', '').lower() == 'true'
+
+# Ensure session directory exists and has proper permissions
+session_dir = os.path.dirname(SESSION_FILE) if os.path.dirname(SESSION_FILE) else '.'
+if not os.path.exists(session_dir):
+    os.makedirs(session_dir, exist_ok=True)
 # =======================
 
 app   = Flask(__name__)

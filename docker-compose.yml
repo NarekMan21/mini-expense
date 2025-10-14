@@ -14,7 +14,8 @@ services:
       - SESSION_FILE=parser.session
       - SKIP_AUTH=false
     volumes:
-      # Persist session files
-      - ./parser.session:/app/parser.session
-      - ./parser.session-journal:/app/parser.session-journal
+      # Create session directory with proper permissions
+      - ./sessions:/app/sessions
+    tmpfs:
+      - /tmp  # Use tmpfs for SQLite operations
     restart: unless-stopped
