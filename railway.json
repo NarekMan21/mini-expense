@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
   "build": {
     "builder": "NIXPACKS"
@@ -5,4 +6,13 @@
   "deploy": {
     "startCommand": "python server.py"
   }
+=======
+{
+  "build": {
+    "builder": "NIXPACKS"
+  },
+  "deploy": {
+    "startCommand": "python server.py"
+  }
+>>>>>>> cba8ccfd8bcae7508b7271bbd90979ee0a11265b
 }
