@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  telegram-cash-app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - API_ID=${API_ID}
+      - API_HASH=${API_HASH}
+      - PHONE=${PHONE}
+      - GROUP_EXP=${GROUP_EXP}
+      - GROUP_INC=${GROUP_INC}
+      - SESSION_FILE=parser.session
+      - SKIP_AUTH=false
+    volumes:
+      # Persist session files
+      - ./parser.session:/app/parser.session
+      - ./parser.session-journal:/app/parser.session-journal
+    restart: unless-stopped

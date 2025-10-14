@@ -13,7 +13,20 @@
 
 ## Запуск
 
-### Локально
+### Docker (рекомендуется)
+```bash
+# Скопировать переменные окружения
+cp .env.example .env
+# Отредактируйте .env с вашими реальными данными
+
+# Запустить через Docker Compose
+docker-compose up -d
+
+# Посмотреть логи
+docker-compose logs -f
+```
+
+### Локально без Docker
 ```bash
 # Создать виртуальное окружение
 python -m venv .venv
@@ -32,6 +45,22 @@ pip install -r requirements.txt
 
 # Запустить сервер (первый раз запросит код Telegram)
 python server.py
+```
+
+### Только Docker
+```bash
+# Собрать образ
+docker build -t telegram-cash-app .
+
+# Запустить контейнер
+docker run -p 8080:8080 \
+  -e API_ID=your_api_id \
+  -e API_HASH=your_api_hash \
+  -e PHONE=your_phone \
+  -e GROUP_EXP=your_expense_group \
+  -e GROUP_INC=your_income_group \
+  -v $(pwd)/parser.session:/app/parser.session \
+  telegram-cash-app
 ```
 
 ### На Render
