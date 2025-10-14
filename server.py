@@ -10,9 +10,15 @@ from telethon.sync import TelegramClient
 from datetime import datetime
 
 # ===== ваши данные =====
-API_ID_STR   = os.getenv('API_ID', '20517386')
-API_HASH     = os.getenv('API_HASH', '73457be44439ae991e7ba2bf97820a31')
-PHONE        = os.getenv('PHONE', '+79281307511')
+# Все переменные окружения обязательны - без них приложение не запустится
+API_ID_STR   = os.getenv('API_ID')
+API_HASH     = os.getenv('API_HASH')
+PHONE        = os.getenv('PHONE')
+
+if not all([API_ID_STR, API_HASH, PHONE]):
+    print("Ошибка: отсутствуют обязательные переменные окружения API_ID, API_HASH, PHONE")
+    print("Создайте файл .env на основе .env.example и заполните значения")
+    exit(1)
 
 # Преобразование с проверкой
 try:
@@ -21,8 +27,13 @@ except ValueError:
     print(f"Ошибка: API_ID должен быть числом, получено: {API_ID_STR}")
     exit(1)
 
-GROUP_EXP_STR = os.getenv('GROUP_EXP', '-4731002756')
-GROUP_INC_STR = os.getenv('GROUP_INC', '-4829787389')
+GROUP_EXP_STR = os.getenv('GROUP_EXP')
+GROUP_INC_STR = os.getenv('GROUP_INC')
+
+if not all([GROUP_EXP_STR, GROUP_INC_STR]):
+    print("Ошибка: отсутствуют переменные GROUP_EXP, GROUP_INC")
+    print("Создайте файл .env на основе .env.example и заполните значения")
+    exit(1)
 
 try:
     GROUP_EXP = int(GROUP_EXP_STR)
