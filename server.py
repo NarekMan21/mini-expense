@@ -10,12 +10,29 @@ from telethon.sync import TelegramClient
 from datetime import datetime
 
 # ===== ваши данные =====
-API_ID       = int(os.getenv('API_ID', 'Ваш API_ID'))
-API_HASH     = os.getenv('API_HASH', 'Ваш API_HASH')
-PHONE        = os.getenv('PHONE', '+71234567890')
-GROUP_EXP    = int(os.getenv('GROUP_EXP', '-4731002756'))   # расход
-GROUP_INC    = int(os.getenv('GROUP_INC', '-4829787389'))   # приход
-SESSION_FILE = 'parser.session'
+API_ID_STR   = os.getenv('API_ID', '20517386')
+API_HASH     = os.getenv('API_HASH', '73457be44439ae991e7ba2bf97820a31')
+PHONE        = os.getenv('PHONE', '+79281307511')
+
+# Преобразование с проверкой
+try:
+    API_ID = int(API_ID_STR)
+except ValueError:
+    print(f"Ошибка: API_ID должен быть числом, получено: {API_ID_STR}")
+    exit(1)
+
+GROUP_EXP_STR = os.getenv('GROUP_EXP', '-4731002756')
+GROUP_INC_STR = os.getenv('GROUP_INC', '-4829787389')
+
+try:
+    GROUP_EXP = int(GROUP_EXP_STR)
+    GROUP_INC = int(GROUP_INC_STR)
+except ValueError as e:
+    print(f"Ошибка преобразования GROUP ID: {e}")
+    exit(1)
+
+SESSION_FILE = os.getenv('SESSION_FILE', 'parser.session')
+SKIP_AUTH = os.getenv('SKIP_AUTH', '').lower() == 'true'
 # =======================
 
 app   = Flask(__name__)
