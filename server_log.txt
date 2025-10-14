@@ -1,0 +1,53 @@
+ * Serving Flask app 'server'
+ * Debug mode: off
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.2.127:8080
+Press CTRL+C to quit
+127.0.0.1 - - [14/Oct/2025 18:23:18] "GET /api/status HTTP/1.1" 404 -
+[2025-10-14 18:24:16,525] ERROR in app: Exception on /api/transactions [GET]
+Traceback (most recent call last):
+  File "C:\Users\21NAR\AppData\Roaming\Python\Python313\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\21NAR\AppData\Roaming\Python\Python313\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\21NAR\AppData\Roaming\Python\Python313\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\21NAR\AppData\Roaming\Python\Python313\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "E:\TMAs\server.py", line 62, in api
+    data = fetch_messages()
+  File "E:\TMAs\server.py", line 27, in fetch_messages
+    client.start(phone=PHONE)   # яхЁт√щ Ёрч чряЁюёшЄ ъюф
+    ~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\21NAR\AppData\Roaming\Python\Python313\site-packages\telethon\client\auth.py", line 128, in start
+    else self.loop.run_until_complete(coro)
+         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Python313\Lib\asyncio\base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "C:\Users\21NAR\AppData\Roaming\Python\Python313\site-packages\telethon\client\auth.py", line 135, in _start
+    await self.connect()
+  File "C:\Users\21NAR\AppData\Roaming\Python\Python313\site-packages\telethon\client\telegrambaseclient.py", line 603, in connect
+    await self._sender.send(functions.InvokeWithLayerRequest(LAYER, req))
+telethon.errors.rpcerrorlist.AuthKeyDuplicatedError: The authorization key (session file) was used under two different IP addresses simultaneously, and can no longer be used. Use the same session exclusively, or use different sessions (caused by InvokeWithLayerRequest(InitConnectionRequest(GetConfigRequest)))
+127.0.0.1 - - [14/Oct/2025 18:24:16] "GET /api/transactions HTTP/1.1" 500 -
+127.0.0.1 - - [14/Oct/2025 18:24:16] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [14/Oct/2025 18:24:16] "GET /api/status HTTP/1.1" 404 -
+127.0.0.1 - - [14/Oct/2025 18:24:17] "GET /api/transactions HTTP/1.1" 200 -
+127.0.0.1 - - [14/Oct/2025 18:24:17] "GET /api/status HTTP/1.1" 404 -
+127.0.0.1 - - [14/Oct/2025 18:24:18] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [14/Oct/2025 18:24:52] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [14/Oct/2025 18:24:52] "GET /api/transactions HTTP/1.1" 200 -
+127.0.0.1 - - [14/Oct/2025 18:25:16] "GET /api/transactions HTTP/1.1" 200 -
+127.0.0.1 - - [14/Oct/2025 18:25:16] "GET /api/status HTTP/1.1" 404 -
+127.0.0.1 - - [14/Oct/2025 18:25:16] "GET /api/transactions HTTP/1.1" 200 -
+127.0.0.1 - - [14/Oct/2025 18:25:17] "GET /api/status HTTP/1.1" 404 -
+127.0.0.1 - - [14/Oct/2025 18:25:54] "GET /api/transactions HTTP/1.1" 200 -
+127.0.0.1 - - [14/Oct/2025 18:25:55] "GET /api/status HTTP/1.1" 404 -
+127.0.0.1 - - [14/Oct/2025 18:25:56] "GET / HTTP/1.1" 304 -
+127.0.0.1 - - [14/Oct/2025 18:25:56] "GET /api/transactions HTTP/1.1" 200 -
+127.0.0.1 - - [14/Oct/2025 18:26:00] "GET / HTTP/1.1" 304 -
+127.0.0.1 - - [14/Oct/2025 18:26:01] "GET /api/transactions HTTP/1.1" 200 -
