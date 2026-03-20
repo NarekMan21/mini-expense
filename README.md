@@ -39,3 +39,12 @@ python server.py
 - Do not commit Telegram API secrets or session files
 - Keep session files out of public repositories
 - Treat this as a practical personal-finance utility, not a polished banking product
+
+## Screenshots
+Add 1-3 screenshots in `docs/images/` and embed them like this:
+
+```md
+![Overview](docs/images/overview.png)
+![Dashboard](docs/images/dashboard.png)
+```
+
